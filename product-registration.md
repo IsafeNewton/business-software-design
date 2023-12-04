@@ -9,7 +9,10 @@ sequenceDiagram
     participant IDB as Insurance Database
     loop Develop Product
         P->>+A: Product details
-        A->>+IDB: Fetch statistics data
+        A->>IDB: Fetch statistics data
+        activate IDB
+        IDB-->>A: Statistical Data
+        deactivate IDB
         A->>-P: Product price
         P->>+P: Review
         opt 
@@ -21,20 +24,24 @@ sequenceDiagram
         L->>+L: Review T&C
         alt Legal approve
             L->>+R: Policy Details
-            RDB->>+R: Fetch rules
-            B->>+R: Fetch rules
+            R->>RDB: Fetch Rules
+            activate RDB
+            RDB-->>R: Rules
+            deactivate RDB
+            R->>+B: Fetch Rules
+            activate B
+            B-->>R: Rules
+            deactivate B
             R->>+R: Compliance check
             alt Regulator approve
                 R->>+P: Approve product
-                P->>+P: Develop smart contract
-                P->>+B: Submit smart contract
+                R->>+R: Develop smart contract
+                R->>+B: Submit smart contract
             else Regulator reject
                 R->>+P: Reject reasons
             end
         else Legal reject
             L->>+P: Reject reasons
         end
-
     end
-
 ```
